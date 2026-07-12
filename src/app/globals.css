@@ -3,6 +3,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --purple-light: #f3e8ff;
+  --black: #111827;
+  --white: #ffffff;
+  --gray-2: #d1d5db;
+  --gray-3: #9ca3af;
 }
 
 @theme inline {
@@ -32,7 +38,7 @@ body {
 }
 
 .tiptap .ProseMirror {
-  margin-top: 10;
+  margin-top: 10px;
   border: 1px solid #515964;
   border-radius: 10px;
 
