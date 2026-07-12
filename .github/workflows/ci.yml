@@ -31,6 +31,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Install Depend
+        run: pnpm install
+
       - name: Create env
         run: |
           echo "${{ secrets.ENV_TESTING }}" > .env.testing
