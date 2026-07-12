@@ -51,7 +51,7 @@ describe("LoginForm", () => {
   });
 
   it("renders email, password and login button", () => {
-    render(<LoginForm />);
+    render(<LoginForm />)
 
     expect(screen.getByPlaceholderText("john@example.com")).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
