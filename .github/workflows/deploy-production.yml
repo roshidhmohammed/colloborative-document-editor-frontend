@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Depend
+        run: pnpm install
+
       - name: Create env
 
         run: |
