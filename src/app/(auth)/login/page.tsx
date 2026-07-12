@@ -14,6 +14,8 @@ export default async function LoginPage({
   const redirectPath =
     typeof returnTo === "string" ? returnTo : undefined;
 
+    console.log("Deployed-1")
+
   return (
     <>
       <header className="mb-8 text-white  text-center">
