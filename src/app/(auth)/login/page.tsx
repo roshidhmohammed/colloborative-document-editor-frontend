@@ -14,7 +14,7 @@ export default async function LoginPage({
   const redirectPath =
     typeof returnTo === "string" ? returnTo : undefined;
 
-    console.log("Deployed-1")
+    console.log("Deployed-1.1")
 
   return (
     <>
