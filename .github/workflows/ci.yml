@@ -32,7 +32,7 @@ jobs:
       - run: npm ci
 
       - name: Install Depend
-        run: pnpm install
+        run:  npm install
 
       - name: Create env
         run: |
