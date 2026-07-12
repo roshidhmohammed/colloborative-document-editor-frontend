@@ -65,7 +65,7 @@ describe("LoginForm", () => {
 
     render(<LoginForm returnTo="/documents" />);
 
-    const user = userEvent.setup();
+    const user = userEvent.setup()
 
     await fillForm(user, { form: "login" });
     await user.click(screen.getByRole("button", { name: /login/i }));
