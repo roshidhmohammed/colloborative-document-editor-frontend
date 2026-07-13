@@ -22,7 +22,7 @@ export async function proxy(request: NextRequest) {
   let isAuthenticated = false;
 
   try {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(
       `${apiBaseUrl}/auth/check-user-auth`,
       {
