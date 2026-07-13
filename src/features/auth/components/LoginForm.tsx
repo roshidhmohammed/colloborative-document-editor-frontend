@@ -20,7 +20,6 @@ import FormField from "@/components/ui/FormField";
 import { getSafePostLoginRedirect } from "@/lib/auth";
 import { AppToast } from "@/lib/toast";
 import { ApiErrorResponse } from "@/features/documents/types/document";
-import { ROUTES } from "@/constants/routes";
 
 
 export default function LoginForm({ returnTo }: LoginFormProps) {
@@ -49,7 +48,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
         title: `${response.message}`,
         description: "You have successfully logged in.",
       });
-      router.replace(ROUTES.DOCUMENTS);
+      router.replace(getSafePostLoginRedirect(returnTo));
 
     } catch (error) {
       const err = error as AxiosError<ApiErrorResponse>;
@@ -63,7 +62,6 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
   }
 
   console.log(process.env.NEXT_PUBLIC_API_URL)
-
      console.log("Deployed-1.1")
 
   return (
