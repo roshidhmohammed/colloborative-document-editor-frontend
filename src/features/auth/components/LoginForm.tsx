@@ -64,7 +64,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
 
   console.log("API URL:", process.env.NEXT_PUBLIC_API_URL)
   console.log("env_api_url", env.API_URL)
-     console.log("Deployed-v-1.4")
+     console.log("Deployed-v-1.5")
 
   return (
     <form
