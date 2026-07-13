@@ -36,10 +36,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Create env
+      # - name: Create env
 
-        run: |
-          echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
+      #   run: |
+      #     echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
 
       - run: npm run test:unit
 
