@@ -58,6 +58,19 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      - name: Show pulled env files
+        run: |
+          ls -la .vercel
+          find .vercel -type f
+
+      - name: Debug env
+        run: |
+          cat .vercel/.env.production.local
+          
+      - name: Verify env during build
+        run: |
+          echo "API=$NEXT_PUBLIC_API_URL"
+
       - name: Build with Vercel
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
