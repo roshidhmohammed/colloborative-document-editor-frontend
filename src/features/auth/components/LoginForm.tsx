@@ -61,6 +61,9 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
     }
   }
 
+  console.log(process.env.NEXT_PUBLIC_API_URL)
+     console.log("Deployed-1.2")
+
   return (
     <form
       noValidate
