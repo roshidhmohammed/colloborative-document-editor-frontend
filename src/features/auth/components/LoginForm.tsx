@@ -21,7 +21,6 @@ import { getSafePostLoginRedirect } from "@/lib/auth";
 import { AppToast } from "@/lib/toast";
 import { ApiErrorResponse } from "@/features/documents/types/document";
 import { env } from "@/config/env";
-import { ROUTES } from "@/constants/routes";
 
 
 export default function LoginForm({ returnTo }: LoginFormProps) {
@@ -50,7 +49,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
         title: `${response.message}`,
         description: "You have successfully logged in.",
       });
-      router.replace(ROUTES.DOCUMENTS);
+       router.replace(getSafePostLoginRedirect(returnTo));
 
     } catch (error) {
       const err = error as AxiosError<ApiErrorResponse>;
