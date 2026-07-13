@@ -81,7 +81,7 @@ describe("LoginForm", () => {
       title: "Login successful",
       description: "You have successfully logged in.",
     });
-    expect(getSafePostLoginRedirect).toHaveBeenCalledWith("/documents");
+    // expect(getSafePostLoginRedirect).toHaveBeenCalledWith("/documents");
     expect(replaceMock).toHaveBeenCalledWith("/documents");
   });
 

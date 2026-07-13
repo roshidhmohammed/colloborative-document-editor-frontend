@@ -20,6 +20,8 @@ export async function proxy(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie");
 
   let isAuthenticated = false;
+  console.log(cookieHeader)
+  console.log("Request Cookie:", request.cookies.get("token"));
 
   try {
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -33,6 +35,7 @@ export async function proxy(request: NextRequest) {
         cache: "no-store",
       }
     );
+    console.log("Auth Status:", response.status)
 
     if (response.ok) {
       const data = await response.json()
