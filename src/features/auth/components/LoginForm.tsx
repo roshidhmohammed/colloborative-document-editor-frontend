@@ -20,6 +20,7 @@ import FormField from "@/components/ui/FormField";
 import { getSafePostLoginRedirect } from "@/lib/auth";
 import { AppToast } from "@/lib/toast";
 import { ApiErrorResponse } from "@/features/documents/types/document";
+import { env } from "@/config/env";
 
 
 export default function LoginForm({ returnTo }: LoginFormProps) {
@@ -61,8 +62,9 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
     }
   }
 
-  console.log(process.env.NEXT_PUBLIC_API_URL)
-     console.log("Deployed-1.2")
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL)
+  console.log("env_api_url", env.API_URL)
+     console.log("Deployed-v-1.4")
 
   return (
     <form
