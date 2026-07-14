@@ -61,8 +61,42 @@ export function isRemoteApiBase(apiBase?: string): boolean {
 }
 
 /**
- * Programmatically log in and return the raw Set-Cookie header value so
+ * Build a Set-Cookie-compatible string from a JWT so fixtures can seed
+ * Playwright contexts when the API returns the token in the JSON body
+ * instead of a Set-Cookie header.
+ */
+function cookieFromToken(token: string): string {
+  return `token=${token}; Path=/; SameSite=Lax`;
+}
+
+/**
+ * Extract a JWT from an API login response body.
+ * Supports `token`, `data.token`, or nested `data` shapes.
+ */
+function extractTokenFromBody(body: Record<string, unknown> | undefined): string | null {
+  if (!body) return null;
+
+  if (typeof body.token === "string" && body.token) {
+    return body.token;
+  }
+
+  const data = body.data;
+  if (data && typeof data === "object") {
+    const nested = data as Record<string, unknown>;
+    if (typeof nested.token === "string" && nested.token) {
+      return nested.token;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Programmatically log in and return a Set-Cookie-compatible string so
  * fixtures can pre-seed a browser context without going through the UI.
+ *
+ * Prefers the Set-Cookie header when present; otherwise builds a cookie from
+ * the JWT returned in the response body (current remote backend behavior).
  */
 export async function loginViaApi(
   email: string,
@@ -89,25 +123,36 @@ export async function loginViaApi(
     cookie = setCookie;
   }
 
-  if (!cookie) {
-    throw new Error(
-      "loginViaApi: login succeeded but no Set-Cookie header was returned"
-    );
-  }
+  const body = res.data as Record<string, unknown> | undefined;
 
-  const body = res.data;
+  if (!cookie) {
+    const token = extractTokenFromBody(body);
+    if (!token) {
+      throw new Error(
+        "loginViaApi: login succeeded but no Set-Cookie header or token was returned"
+      );
+    }
+    cookie = cookieFromToken(token);
+  }
 
   // Real backends may wrap the user under `data` (e.g. { success, message, data: { user } })
   // or place it at the top level (e.g. { success, message, user }).
+  // Some also return the user fields directly on `data`.
   const rawUser =
-    body?.user ?? body?.data?.user ?? body?.data ?? undefined;
+    body?.user ??
+    (body?.data as { user?: unknown } | undefined)?.user ??
+    body?.data ??
+    undefined;
 
-  if (!rawUser) throw new Error("loginViaApi: no user in response");
+  if (!rawUser || typeof rawUser !== "object") {
+    throw new Error("loginViaApi: no user in response");
+  }
 
+  const userRecord = rawUser as Record<string, unknown>;
   const user: ApiUser = {
-    _id: rawUser._id ?? rawUser.id,
-    fullName: rawUser.fullName,
-    email: rawUser.email,
+    _id: String(userRecord._id ?? userRecord.id ?? ""),
+    fullName: String(userRecord.fullName ?? ""),
+    email: String(userRecord.email ?? ""),
   };
 
   return { cookie, user };
