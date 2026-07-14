@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from "@/constants/api";
 import { ROUTES } from "@/constants/routes";
 import { AppToast } from "@/lib/toast";
 import { clearAuthToken } from "@/features/auth/actions/authCookies";
+import { withAuthHeaders } from "@/lib/auth-token";
 
 const ProfileModal = () => {
   const data = useFetchProfile();
@@ -14,7 +15,11 @@ const ProfileModal = () => {
 
   const handleLogout = async () => {
     try {
-      await axiosInstance.post(API_ENDPOINTS.LOGOUT, {}, { withCredentials: true });
+      await axiosInstance.post(
+        API_ENDPOINTS.LOGOUT,
+        {},
+        { withCredentials: true, ...withAuthHeaders() }
+      );
       await clearAuthToken();
       router.replace(ROUTES.LOGIN);
     } catch (error) {

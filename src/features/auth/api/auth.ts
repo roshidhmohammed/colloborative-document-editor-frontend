@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axios";
 
 import { API_ENDPOINTS } from "@/constants/api";
+import { withAuthHeaders } from "@/lib/auth-token";
 
 import {
   LoginRequest,
@@ -34,7 +35,8 @@ export async function loginApi(
 export async function userAuthApi(
 ): Promise<LoginResponse> {
   const response = await axiosInstance.get(
-    API_ENDPOINTS.USER_AUTH
+    API_ENDPOINTS.USER_AUTH,
+    withAuthHeaders()
   );
 
   return response.data;
