@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from "@/constants/api";
 import axiosInstance from "@/lib/axios";
+import { withAuthHeaders } from "@/lib/auth-token";
 
 import type {
   GetCollaboratorsResponse,
@@ -10,7 +11,8 @@ export async function getCollaboratorsApi(
   documentId: string
 ): Promise<GetCollaboratorsResponse> {
   const response = await axiosInstance.get(
-    API_ENDPOINTS.DOCUMENT_COLLABORATORS(documentId)
+    API_ENDPOINTS.DOCUMENT_COLLABORATORS(documentId),
+    withAuthHeaders()
   );
 
   return response.data.data;
@@ -22,6 +24,7 @@ export async function registerDocumentCollaboratorApi(
 ): Promise<void> {
   await axiosInstance.post(
     API_ENDPOINTS.DOCUMENT_COLLABORATORS(documentId),
-    payload
+    payload,
+    withAuthHeaders()
   );
 }

@@ -111,7 +111,7 @@ describe("LoginForm", () => {
     expect(replaceMock).not.toHaveBeenCalled();
   });
 
-  it("shows generic API error message when login fails without response data", async () => {
+  it("shows error message when login fails without response data", async () => {
     loginAsyncMock.mockRejectedValue(new Error("Network failure"));
 
     render(<LoginForm />);
@@ -124,7 +124,7 @@ describe("LoginForm", () => {
     await waitFor(() => {
       expect(AppToast.error).toHaveBeenCalledWith({
         title: "Login failed",
-        description: "An error occurred during login.",
+        description: "Network failure",
       });
     });
 

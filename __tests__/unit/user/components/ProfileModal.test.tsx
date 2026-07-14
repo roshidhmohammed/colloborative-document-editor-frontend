@@ -33,6 +33,12 @@ jest.mock("@/lib/toast", () => ({
   },
 }));
 
+const clearAuthTokenMock = jest.fn();
+
+jest.mock("@/features/auth/actions/authCookies", () => ({
+  clearAuthToken: (...args: unknown[]) => clearAuthTokenMock(...args),
+}));
+
 describe("ProfileModal", () => {
   const postMock = axiosInstance.post as jest.Mock;
   const errorToastMock = AppToast.error as jest.Mock;
@@ -40,6 +46,7 @@ describe("ProfileModal", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     errorToastMock.mockReset();
+    clearAuthTokenMock.mockResolvedValue(undefined);
     mockUseFetchProfile.mockReturnValue({
       fullName: "Ada Lovelace",
       email: "ada@example.com",
@@ -71,11 +78,12 @@ describe("ProfileModal", () => {
       expect(postMock).toHaveBeenCalledWith(
         API_ENDPOINTS.LOGOUT,
         {},
-        { withCredentials: true }
+        expect.objectContaining({ withCredentials: true })
       );
     });
 
     await waitFor(() => {
+      expect(clearAuthTokenMock).toHaveBeenCalled();
       expect(mockReplace).toHaveBeenCalledWith("/login");
     });
   });

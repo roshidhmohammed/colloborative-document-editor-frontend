@@ -22,3 +22,10 @@ export function authHeaders(token?: string | null): Record<string, string> {
     Cookie: `token=${token}`,
   };
 }
+
+/** Axios request config with the auth cookie/token headers attached. */
+export function withAuthHeaders(): { headers: Record<string, string> } {
+  return {
+    headers: authHeaders(getClientAuthToken()),
+  };
+}
