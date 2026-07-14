@@ -14,7 +14,7 @@ export async function setAuthToken(token: string): Promise<void> {
 
   // httpOnly: false so client axios can read the cookie and attach it as headers
   cookieStore.set(AUTH_COOKIE_NAME, token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
