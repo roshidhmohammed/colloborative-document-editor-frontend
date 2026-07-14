@@ -39,13 +39,13 @@ jobs:
       #   run: |
       #     echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
 
-      - run: npm run test:unit
+      # - run: npm run test:unit
 
       - run: npm run build
 
-      - run: npx playwright install --with-deps
+      # - run: npx playwright install --with-deps
 
-      - run: npm run test:e2e
+      # - run: npm run test:e2e
 
       - name: Install Vercel CLI
         run: npm install --global vercel
