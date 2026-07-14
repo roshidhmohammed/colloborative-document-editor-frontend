@@ -5,6 +5,7 @@ import {
   PUBLIC_ROUTES,
 } from "@/lib/auth";
 import { ROUTES } from "@/constants/routes";
+import { authHeaders } from "@/lib/auth-token";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -15,7 +16,6 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  // Cookie set after login via cookies() from next/headers (Server Action)
   const token = request.cookies.get("token")?.value;
 
   let isAuthenticated = false;
@@ -27,7 +27,7 @@ export async function proxy(request: NextRequest) {
       {
         method: "GET",
         headers: {
-          cookie: token ? `token=${token}` : "",
+          ...authHeaders(token),
         },
         cache: "no-store",
       }
