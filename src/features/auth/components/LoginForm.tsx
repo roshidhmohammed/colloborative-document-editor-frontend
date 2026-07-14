@@ -49,6 +49,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
         title: `${response.message}`,
         description: "You have successfully logged in.",
       });
+      await new Promise(resolve => setTimeout(resolve, 1000));
        router.replace(getSafePostLoginRedirect(returnTo));
 
     } catch (error) {
