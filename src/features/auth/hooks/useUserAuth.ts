@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { authService } from "../services/auth";
+import { authedQueryFn } from "@/lib/auth-token";
 
 export function useUserAuth() {
   const query = useQuery({
     queryKey: ["userAuth"],
-    queryFn: authService.userAuth,
+    queryFn: authedQueryFn((auth) => authService.userAuth(auth)),
   });
 
   return {

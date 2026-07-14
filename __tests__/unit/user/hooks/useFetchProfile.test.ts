@@ -33,7 +33,7 @@ describe("useFetchProfile", () => {
 
     expect(useQueryMock).toHaveBeenCalledWith({
       queryKey: ["userProfile"],
-      queryFn: userService.getProfile,
+      queryFn: expect.any(Function),
     });
   });
 
@@ -77,11 +77,15 @@ describe("useFetchProfile", () => {
     expect(result.current).toBeNull();
   });
 
-  it("uses userService.getProfile as the query function", () => {
+  it("uses an authed queryFn that calls userService.getProfile with auth headers", async () => {
     renderHook(() => useFetchProfile());
 
     const [options] = useQueryMock.mock.calls[0];
 
-    expect(options.queryFn).toBe(userService.getProfile);
+    expect(options.queryFn).toEqual(expect.any(Function));
+    await options.queryFn();
+    expect(getProfileMock).toHaveBeenCalledWith(
+      expect.objectContaining({ headers: expect.any(Object) })
+    );
   });
 });

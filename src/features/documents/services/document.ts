@@ -10,20 +10,28 @@ import {
   GetAllDocumentsResponse,
   GetDocumentResponse,
 } from "../types/document";
+import type { AuthRequestConfig } from "@/lib/auth-token";
+import { withAuthHeaders } from "@/lib/auth-token";
 
 class DocumentService {
   async createDocument(
-    payload: CreateDocumentRequest
+    payload: CreateDocumentRequest,
+    auth: AuthRequestConfig = withAuthHeaders(),
   ): Promise<CreateDocumentResponse> {
-    return createDocumentApi(payload);
+    return createDocumentApi(payload, auth);
   }
 
-  async getAllDocuments(): Promise<GetAllDocumentsResponse> {
-    return getAllDocumentsApi();
+  async getAllDocuments(
+    auth: AuthRequestConfig = withAuthHeaders(),
+  ): Promise<GetAllDocumentsResponse> {
+    return getAllDocumentsApi(auth);
   }
 
-  async getDocument(documentToken: string): Promise<GetDocumentResponse> {
-    return getDocumentApi(documentToken);
+  async getDocument(
+    documentToken: string,
+    auth: AuthRequestConfig = withAuthHeaders(),
+  ): Promise<GetDocumentResponse> {
+    return getDocumentApi(documentToken, auth);
   }
 }
 

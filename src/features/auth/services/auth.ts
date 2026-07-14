@@ -12,6 +12,8 @@ import {
   RegisterRequest,
   RegisterResponse,
 } from "../types/auth";
+import type { AuthRequestConfig } from "@/lib/auth-token";
+import { withAuthHeaders } from "@/lib/auth-token";
 
 class AuthService {
   async register(
@@ -42,8 +44,10 @@ class AuthService {
     await clearAuthToken();
   }
 
-  async userAuth(): Promise<LoginResponse> {
-    return userAuthApi();
+  async userAuth(
+    auth: AuthRequestConfig = withAuthHeaders(),
+  ): Promise<LoginResponse> {
+    return userAuthApi(auth);
   }
 }
 

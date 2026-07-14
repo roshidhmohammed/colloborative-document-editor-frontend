@@ -29,7 +29,7 @@ describe("useFetchDocuments", () => {
 
     expect(useQueryMock).toHaveBeenCalledWith({
       queryKey: ["documents"],
-      queryFn: documentService.getAllDocuments,
+      queryFn: expect.any(Function),
     });
   });
 
@@ -107,11 +107,15 @@ describe("useFetchDocuments", () => {
     expect(result.current.error).toBe(error);
   });
 
-  it("uses documentService.getAllDocuments as the query function", () => {
+  it("uses an authed queryFn that calls documentService.getAllDocuments with auth headers", async () => {
     renderHook(() => useFetchDocuments());
 
     const [options] = useQueryMock.mock.calls[0];
 
-    expect(options.queryFn).toBe(documentService.getAllDocuments);
+    expect(options.queryFn).toEqual(expect.any(Function));
+    await options.queryFn();
+    expect(getAllDocumentsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ headers: expect.any(Object) })
+    );
   });
 });

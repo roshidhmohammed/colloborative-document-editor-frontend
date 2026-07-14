@@ -1,6 +1,9 @@
 import axiosInstance from "@/lib/axios";
 import { API_ENDPOINTS } from "@/constants/api";
-import { withAuthHeaders } from "@/lib/auth-token";
+import {
+  type AuthRequestConfig,
+  withAuthHeaders,
+} from "@/lib/auth-token";
 
 import {
   CreateDocumentRequest,
@@ -11,29 +14,33 @@ import {
 
 export async function createDocumentApi(
   payload: CreateDocumentRequest,
+  auth: AuthRequestConfig = withAuthHeaders(),
 ): Promise<CreateDocumentResponse> {
   const response = await axiosInstance.post(
     API_ENDPOINTS.DOCUMENTS,
     payload,
-    withAuthHeaders(),
+    auth,
   );
   return response.data;
 }
 
-export async function getAllDocumentsApi(): Promise<GetAllDocumentsResponse> {
+export async function getAllDocumentsApi(
+  auth: AuthRequestConfig = withAuthHeaders(),
+): Promise<GetAllDocumentsResponse> {
   const response = await axiosInstance.get(
     API_ENDPOINTS.DOCUMENTS,
-    withAuthHeaders(),
+    auth,
   );
   return response.data.data;
 }
 
 export async function getDocumentApi(
   documentToken: string,
+  auth: AuthRequestConfig = withAuthHeaders(),
 ): Promise<GetDocumentResponse> {
   const response = await axiosInstance.get(
     API_ENDPOINTS.DOCUMENT_BY_TOKEN(documentToken),
-    withAuthHeaders(),
+    auth,
   );
   return response.data.data;
 }

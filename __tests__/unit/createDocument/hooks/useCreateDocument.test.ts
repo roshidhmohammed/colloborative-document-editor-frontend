@@ -34,12 +34,23 @@ describe("useCreateDocument", () => {
     });
   });
 
-  it("calls useMutation with documentService.createDocument", () => {
+  it("calls useMutation with an authed createDocument mutationFn", async () => {
     renderHook(() => useCreateDocument());
 
     expect(useMutation).toHaveBeenCalledWith({
-      mutationFn: documentService.createDocument,
+      mutationFn: expect.any(Function),
     });
+
+    const { mutationFn } = (useMutation as jest.Mock).mock.calls[0][0] as {
+      mutationFn: (payload: { topic: string }) => Promise<unknown>;
+    };
+
+    await mutationFn({ topic: "Test" });
+
+    expect(documentService.createDocument).toHaveBeenCalledWith(
+      { topic: "Test" },
+      expect.objectContaining({ headers: expect.any(Object) })
+    );
   });
 
   it("returns create document mutation functions", () => {
