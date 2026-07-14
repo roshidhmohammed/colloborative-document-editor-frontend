@@ -1,11 +1,16 @@
+
 import { NextRequest, NextResponse } from "next/server";
-import axiosInstance from "@/lib/axios";
 
 import {
   isProtectedRoute,
   PUBLIC_ROUTES,
 } from "@/lib/auth";
 import { ROUTES } from "@/constants/routes";
+
+import { cookies } from "next/headers";
+
+const cookieStore = await cookies();
+const token = cookieStore.get("token");
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -16,45 +21,52 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith(route)
   );
 
+  // Get incoming cookie
   const cookieHeader = request.headers.get("cookie");
 
   let isAuthenticated = false;
 
-  console.log("Cookie Header:", cookieHeader);
-  console.log("Request Cookie:", request.cookies.get("token"));
+console.log("Cookie Header:", request.headers.get("cookie"));
+  console.log("Cookie Token:", token);
 
   try {
-    const response = await axiosInstance.get(
-      "/auth/check-user-auth",
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const response = await fetch(
+      `${apiBaseUrl}/auth/check-user-auth`,
       {
+        method: "GET",
         headers: {
-          Cookie: cookieHeader ?? "",
+          cookie: cookieHeader ?? "",
         },
+        cache: "no-store",
       }
     );
+    console.log("Auth Status:", response.status)
 
-    console.log("Auth Status:", response.status);
-
-    isAuthenticated = response.data.success;
-  } catch (error: any) {
-    console.error(
-      "Auth verification failed:",
-      error.response?.status,
-      error.message
-    );
+    if (response.ok) {
+      const data = await response.json()
+      isAuthenticated = data.success;
+    }
+  } catch (error) {
+    console.error("Auth verification failed:", error);
     isAuthenticated = false;
   }
 
+  /**
+   * User is NOT authenticated
+   */
   if (!isAuthenticated && protectedRoute) {
     const loginUrl = new URL(ROUTES.LOGIN, request.url);
-    loginUrl.searchParams.set(
-      "returnTo",
-      `${pathname}${request.nextUrl.search}`
-    );
+    const returnTo = `${pathname}${request.nextUrl.search}`;
+
+    loginUrl.searchParams.set("returnTo", returnTo);
 
     return NextResponse.redirect(loginUrl);
   }
 
+  /**
+   * User is authenticated
+   */
   if (isAuthenticated && isPublicRoute) {
     return NextResponse.redirect(
       new URL(ROUTES.DOCUMENTS, request.url)
