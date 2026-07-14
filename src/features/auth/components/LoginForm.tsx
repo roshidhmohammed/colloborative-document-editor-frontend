@@ -20,8 +20,6 @@ import FormField from "@/components/ui/FormField";
 import { getSafePostLoginRedirect } from "@/lib/auth";
 import { AppToast } from "@/lib/toast";
 import { ApiErrorResponse } from "@/features/documents/types/document";
-import { env } from "@/config/env";
-
 
 export default function LoginForm({ returnTo }: LoginFormProps) {
   const router = useRouter();
@@ -44,26 +42,26 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
   async function onSubmit(data: LoginSchema) {
     try {
       const response = await loginMutation.loginAsync(data);
-      console.log(response)
+
       AppToast.success({
         title: `${response.message}`,
         description: "You have successfully logged in.",
       });
-      await new Promise(resolve => setTimeout(resolve, 5000));
-       router.replace(getSafePostLoginRedirect(returnTo));
 
+      router.replace(getSafePostLoginRedirect(returnTo));
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>;
+      const err = error as AxiosError<ApiErrorResponse> | Error;
+      const description =
+        (err as AxiosError<ApiErrorResponse>).response?.data?.message ||
+        (err instanceof Error ? err.message : null) ||
+        "An error occurred during login.";
 
       AppToast.error({
         title: "Login failed",
-        description: err.response?.data?.message || "An error occurred during login.",
+        description,
       });
-
     }
   }
-
-     console.log("Deployed-v-1.8")
 
   return (
     <form

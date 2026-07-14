@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -16,13 +15,10 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  // Get incoming cookie
-  const cookieHeader = request.headers.get("cookie");
+  // Cookie set after login via cookies() from next/headers (Server Action)
+  const token = request.cookies.get("token")?.value;
 
   let isAuthenticated = false;
-
-console.log("Cookie Header:", request.headers.get("cookie"));
-  console.log("Request Cookie:", request.cookies.get("token"));
 
   try {
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -31,15 +27,14 @@ console.log("Cookie Header:", request.headers.get("cookie"));
       {
         method: "GET",
         headers: {
-          cookie: cookieHeader ?? "",
+          cookie: token ? `token=${token}` : "",
         },
         cache: "no-store",
       }
     );
-    console.log("Auth Status:", response.status)
 
     if (response.ok) {
-      const data = await response.json()
+      const data = await response.json();
       isAuthenticated = data.success;
     }
   } catch (error) {

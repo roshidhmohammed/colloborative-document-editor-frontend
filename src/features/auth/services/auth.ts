@@ -1,4 +1,5 @@
-
+import { loginAction } from "../actions/login";
+import { clearAuthToken } from "../actions/authCookies";
 import {
   loginApi,
   registerApi,
@@ -19,15 +20,31 @@ class AuthService {
     return registerApi(payload);
   }
 
+  /**
+   * 1. Server Action sets `token` on this app via cookies() (proxy can read it).
+   * 2. Client API login stores the API-domain cookie (axios/socket credentials).
+   */
   async login(
     payload: LoginRequest
   ): Promise<LoginResponse> {
-    return loginApi(payload);
+    const result = await loginAction(payload);
+
+    try {
+      await loginApi(payload);
+    } catch {
+      // Next.js session cookie is already set; API cookie is best-effort.
+    }
+
+    return result;
   }
 
-  async userAuth():Promise<LoginResponse> {
+  async logout(): Promise<void> {
+    await clearAuthToken();
+  }
+
+  async userAuth(): Promise<LoginResponse> {
     return userAuthApi();
-}
+  }
 }
 
 export const authService = new AuthService();
