@@ -49,7 +49,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
         title: `${response.message}`,
         description: "You have successfully logged in.",
       });
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 5000));
        router.replace(getSafePostLoginRedirect(returnTo));
 
     } catch (error) {
@@ -63,7 +63,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
     }
   }
 
-     console.log("Deployed-v-1.7")
+     console.log("Deployed-v-1.8")
 
   return (
     <form

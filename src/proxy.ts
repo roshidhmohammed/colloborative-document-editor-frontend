@@ -7,11 +7,6 @@ import {
 } from "@/lib/auth";
 import { ROUTES } from "@/constants/routes";
 
-import { cookies } from "next/headers";
-
-const cookieStore = await cookies();
-const token = cookieStore.get("token");
-
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
@@ -27,7 +22,7 @@ export async function proxy(request: NextRequest) {
   let isAuthenticated = false;
 
 console.log("Cookie Header:", request.headers.get("cookie"));
-  console.log("Cookie Token:", token);
+  console.log("Request Cookie:", request.cookies.get("token"));
 
   try {
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
