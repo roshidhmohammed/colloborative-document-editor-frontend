@@ -1,5 +1,5 @@
-
 import { NextRequest, NextResponse } from "next/server";
+import axiosInstance from "@/lib/axios";
 
 import {
   isProtectedRoute,
@@ -16,52 +16,45 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  // Get incoming cookie
   const cookieHeader = request.headers.get("cookie");
 
   let isAuthenticated = false;
 
-console.log("Cookie Header:", request.headers.get("cookie"));
+  console.log("Cookie Header:", cookieHeader);
   console.log("Request Cookie:", request.cookies.get("token"));
 
   try {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
-    const response = await fetch(
-      `${apiBaseUrl}/auth/check-user-auth`,
+    const response = await axiosInstance.get(
+      "/auth/check-user-auth",
       {
-        method: "GET",
         headers: {
-          cookie: cookieHeader ?? "",
+          Cookie: cookieHeader ?? "",
         },
-        cache: "no-store",
       }
     );
-    console.log("Auth Status:", response.status)
 
-    if (response.ok) {
-      const data = await response.json()
-      isAuthenticated = data.success;
-    }
-  } catch (error) {
-    console.error("Auth verification failed:", error);
+    console.log("Auth Status:", response.status);
+
+    isAuthenticated = response.data.success;
+  } catch (error: any) {
+    console.error(
+      "Auth verification failed:",
+      error.response?.status,
+      error.message
+    );
     isAuthenticated = false;
   }
 
-  /**
-   * User is NOT authenticated
-   */
   if (!isAuthenticated && protectedRoute) {
     const loginUrl = new URL(ROUTES.LOGIN, request.url);
-    const returnTo = `${pathname}${request.nextUrl.search}`;
-
-    loginUrl.searchParams.set("returnTo", returnTo);
+    loginUrl.searchParams.set(
+      "returnTo",
+      `${pathname}${request.nextUrl.search}`
+    );
 
     return NextResponse.redirect(loginUrl);
   }
 
-  /**
-   * User is authenticated
-   */
   if (isAuthenticated && isPublicRoute) {
     return NextResponse.redirect(
       new URL(ROUTES.DOCUMENTS, request.url)
