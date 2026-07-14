@@ -13,10 +13,10 @@ export const getSocket = () => {
       autoConnect: true,
       transports: ["websocket"],
       auth: token ? { token } : undefined,
+      // Do not set Cookie here — forbidden in browsers. Auth goes via `auth.token`.
       extraHeaders: token
         ? {
             Authorization: `Bearer ${token}`,
-            Cookie: `token=${token}`,
           }
         : undefined,
     });

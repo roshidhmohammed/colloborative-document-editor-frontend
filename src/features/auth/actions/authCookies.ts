@@ -12,7 +12,9 @@ export async function setAuthToken(token: string): Promise<void> {
 
   const cookieStore = await cookies();
 
-  // httpOnly: false so client axios can read the cookie and attach it as headers
+  // httpOnly: false so sockets can read the token from document.cookie.
+  // Cookie is never set as a request header from the browser (forbidden);
+  // /api-proxy forwards it server-side to the API instead.
   cookieStore.set(AUTH_COOKIE_NAME, token, {
     httpOnly: false,
     secure: process.env.NODE_ENV === "production",

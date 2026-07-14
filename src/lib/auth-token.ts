@@ -3,7 +3,8 @@ import type { AxiosRequestConfig } from "axios";
 /**
  * Shared auth header helpers.
  * Token cookie is set via next/headers after login (httpOnly: false)
- * so TanStack useQuery hooks can attach it on every request.
+ * so sockets can read it; HTTP APIs use `/api-proxy` which attaches Cookie
+ * server-side (browsers refuse the Cookie request header).
  */
 export function getClientAuthToken(): string | null {
   if (typeof document === "undefined") {
@@ -14,20 +15,31 @@ export function getClientAuthToken(): string | null {
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
 
-export function authHeaders(token?: string | null): Record<string, string> {
+export function authHeaders(
+  token?: string | null,
+  {
+    includeCookie = typeof window === "undefined",
+  }: { includeCookie?: boolean } = {},
+): Record<string, string> {
   if (!token) {
     return {};
   }
 
-  return {
+  const headers: Record<string, string> = {
     Authorization: `Bearer ${token}`,
-    Cookie: `token=${token}`,
   };
+
+  // Cookie is a forbidden request header in browsers; only attach server-side.
+  if (includeCookie) {
+    headers.Cookie = `token=${token}`;
+  }
+
+  return headers;
 }
 
 export type AuthRequestConfig = Pick<AxiosRequestConfig, "headers">;
 
-/** Axios request config with the auth cookie/token headers attached. */
+/** Axios request config with the auth token headers attached. */
 export function withAuthHeaders(): AuthRequestConfig {
   return {
     headers: authHeaders(getClientAuthToken()),
@@ -36,10 +48,10 @@ export function withAuthHeaders(): AuthRequestConfig {
 
 /**
  * Wrap a service call as a TanStack `queryFn` that always sends
- * Cookie `token` + Authorization headers.
+ * Authorization (and relies on same-origin `/api-proxy` for Cookie).
  */
 export function authedQueryFn<T>(
-  fn: (auth: AuthRequestConfig) => Promise<T>
+  fn: (auth: AuthRequestConfig) => Promise<T>,
 ): () => Promise<T> {
   return () => fn(withAuthHeaders());
 }
