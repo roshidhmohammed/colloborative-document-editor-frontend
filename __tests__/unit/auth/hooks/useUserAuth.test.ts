@@ -58,13 +58,22 @@ describe("useUserAuth", () => {
     );
   });
 
-  it("calls useQuery with authService.userAuth as the queryFn", () => {
+  it("calls useQuery with an authed authService.userAuth queryFn", async () => {
     renderHook(() => useUserAuth());
 
     expect(useQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        queryFn: authService.userAuth,
+        queryFn: expect.any(Function),
       })
+    );
+
+    const { queryFn } = useQueryMock.mock.calls[0][0] as {
+      queryFn: () => Promise<unknown>;
+    };
+    await queryFn();
+
+    expect(authService.userAuth).toHaveBeenCalledWith(
+      expect.objectContaining({ headers: expect.any(Object) })
     );
   });
 

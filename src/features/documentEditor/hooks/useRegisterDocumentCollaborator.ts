@@ -6,6 +6,7 @@ import {
   selectCurrentDocumentRole,
   useFetchDocumentDetails,
 } from "@/features/documents";
+import { authedQueryFn } from "@/lib/auth-token";
 
 import { collaboratorService } from "../../collaborators/services/collaborator";
 
@@ -28,15 +29,17 @@ export function useRegisterDocumentCollaborator(
       documentToken,
       role,
     ],
-    queryFn: async () => {
-      await collaboratorService.registerDocumentCollaborator(documentId, {
-        role: role!,
-      });
+    queryFn: authedQueryFn(async (auth) => {
+      await collaboratorService.registerDocumentCollaborator(
+        documentId,
+        { role: role! },
+        auth
+      );
 
       await queryClient.invalidateQueries({
         queryKey: ["documents", documentId, "collaborators"],
       });
-    },
+    }),
     enabled: Boolean(documentId && documentToken && role),
     staleTime: REGISTRATION_STALE_TIME,
     retry: 1,

@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { documentService } from "../services/document";
+import { authedQueryFn } from "@/lib/auth-token";
 import type {
   DocumentDetails,
   DocumentShareLink,
@@ -43,8 +44,6 @@ export const selectCanEditDocument = (response: GetDocumentResponse) => {
   return role === "OWNER" || role === "EDITOR";
 };
 
-
-
 /** Fetches and caches document and share details by token. */
 export function useFetchDocumentDetails<TData = GetDocumentResponse>(
   documentToken: string,
@@ -52,7 +51,9 @@ export function useFetchDocumentDetails<TData = GetDocumentResponse>(
 ) {
   return useQuery({
     queryKey: documentDetailsQueryKey(documentToken),
-    queryFn: () => documentService.getDocument(documentToken),
+    queryFn: authedQueryFn((auth) =>
+      documentService.getDocument(documentToken, auth)
+    ),
     enabled: Boolean(documentToken),
     staleTime: DOCUMENT_DETAILS_STALE_TIME,
     gcTime: DOCUMENT_DETAILS_GC_TIME,

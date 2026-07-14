@@ -6,19 +6,23 @@ import type {
   GetCollaboratorsResponse,
   RegisterDocumentCollaboratorRequest,
 } from "../../documentEditor/types/documentEditor";
+import type { AuthRequestConfig } from "@/lib/auth-token";
+import { withAuthHeaders } from "@/lib/auth-token";
 
 class CollaboratorService {
   async getCollaborators(
-    documentId: string
+    documentId: string,
+    auth: AuthRequestConfig = withAuthHeaders(),
   ): Promise<GetCollaboratorsResponse> {
-    return getCollaboratorsApi(documentId);
+    return getCollaboratorsApi(documentId, auth);
   }
 
   async registerDocumentCollaborator(
     documentId: string,
-    payload: RegisterDocumentCollaboratorRequest
+    payload: RegisterDocumentCollaboratorRequest,
+    auth: AuthRequestConfig = withAuthHeaders(),
   ): Promise<void> {
-    return registerDocumentCollaboratorApi(documentId, payload);
+    return registerDocumentCollaboratorApi(documentId, payload, auth);
   }
 }
 

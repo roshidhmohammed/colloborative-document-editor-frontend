@@ -85,7 +85,8 @@ describe("useFetchCollaborators", () => {
     const result = await queryFn();
 
     expect(collaboratorService.getCollaborators).toHaveBeenCalledWith(
-      documentId
+      documentId,
+      expect.objectContaining({ headers: expect.any(Object) })
     );
     expect(result).toEqual(mockCollaborators);
   });

@@ -131,7 +131,10 @@ describe("useFetchDocumentDetails", () => {
       const [options] = useQueryMock.mock.calls[0];
       const result = await options.queryFn();
 
-      expect(getDocumentMock).toHaveBeenCalledWith("token-123");
+      expect(getDocumentMock).toHaveBeenCalledWith(
+        "token-123",
+        expect.objectContaining({ headers: expect.any(Object) })
+      );
       expect(result).toEqual(buildDocumentResponse());
     });
   });
