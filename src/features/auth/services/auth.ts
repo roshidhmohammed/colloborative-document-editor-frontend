@@ -3,7 +3,7 @@ import {
   loginApi,
   registerApi,
   userAuthApi,
-} from "../api/route";
+} from "../api/auth";
 
 import {
   LoginRequest,

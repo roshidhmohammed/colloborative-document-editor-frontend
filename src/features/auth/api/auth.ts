@@ -1,3 +1,5 @@
+
+import 'server-only'
 import axiosInstance from "@/lib/axios";
 
 import { API_ENDPOINTS } from "@/constants/api";
