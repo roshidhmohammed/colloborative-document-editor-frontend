@@ -4,7 +4,7 @@ import CreateDocument from "@/features/documents/components/CreateDocument";
 import { useRouter } from "next/navigation";
 import { useCreateDocument } from "@/features/documents/hooks/useCreateDocument";
 import { AppToast } from "@/lib/toast";
-import { ROUTES } from "@/constants/apiRoutes";
+import { PAGEROUTES } from "@/constants/apiRoutes";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
@@ -70,7 +70,7 @@ describe("CreateDocument", () => {
       title: "Document created successfully",
       description: "You have successfully logged in.",
     });
-    expect(replaceMock).toHaveBeenCalledWith(`${ROUTES.DOCUMENTS}/123/o112df23343222dxd`);
+    expect(replaceMock).toHaveBeenCalledWith(`${PAGEROUTES.DOCUMENTS}/123/o112df23343222dxd`);
   });
 
   it("blocks submission when the topic is empty or only whitespace", async () => {
