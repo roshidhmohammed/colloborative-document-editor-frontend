@@ -1,12 +1,7 @@
 "use client";
 
-import { ButtonHTMLAttributes } from "react";
+import { ButtonProps } from "@/types/buttons";
 import { cn } from "@/utils/cn";
-
-interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
-  loading?: boolean;
-}
 
 export default function Button({
   children,
@@ -22,7 +17,7 @@ export default function Button({
         "w-full rounded-lg bg-blue-600 px-4 py-3 font-medium text-white transition",
         "hover:bg-blue-700",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        className
+        className,
       )}
       {...props}
     >

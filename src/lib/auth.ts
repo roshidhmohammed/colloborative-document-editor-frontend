@@ -1,14 +1,14 @@
 
-import { ROUTES } from "@/constants/routes";
+import { PAGEROUTES } from "@/constants/apiRoutes";
 
 export const PUBLIC_ROUTES = [
-  ROUTES.LOGIN,
-  ROUTES.REGISTER,
+  PAGEROUTES.LOGIN,
+  PAGEROUTES.REGISTER,
 ];
 
 export const PROTECTED_ROUTES = [
-  ROUTES.DOCUMENTS,
-  ROUTES.CREATE_DOCUMENT,
+  PAGEROUTES.DOCUMENTS,
+  PAGEROUTES.CREATE_DOCUMENT,
 ];
 
 export function isProtectedRoute(pathname: string) {
@@ -19,7 +19,7 @@ export function isProtectedRoute(pathname: string) {
 
 export function getSafePostLoginRedirect(returnTo?: string) {
   if (!returnTo?.startsWith("/") || returnTo.startsWith("//")) {
-    return ROUTES.DOCUMENTS;
+    return PAGEROUTES.DOCUMENTS;
   }
 
   try {
@@ -30,11 +30,11 @@ export function getSafePostLoginRedirect(returnTo?: string) {
       destination.origin !== baseUrl.origin ||
       !isProtectedRoute(destination.pathname)
     ) {
-      return ROUTES.DOCUMENTS;
+      return PAGEROUTES.DOCUMENTS;
     }
 
     return `${destination.pathname}${destination.search}${destination.hash}`;
   } catch {
-    return ROUTES.DOCUMENTS;
+    return PAGEROUTES.DOCUMENTS;
   }
 }

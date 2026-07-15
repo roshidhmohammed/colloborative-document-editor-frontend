@@ -14,7 +14,7 @@ const REGISTRATION_STALE_TIME = 5 * 60 * 1000;
 
 export function useRegisterDocumentCollaborator(
   documentId: string,
-  documentToken: string
+  documentToken: string,
 ) {
   const queryClient = useQueryClient();
   const { data: role } = useFetchDocumentDetails(documentToken, {
@@ -33,7 +33,7 @@ export function useRegisterDocumentCollaborator(
       await collaboratorService.registerDocumentCollaborator(
         documentId,
         { role: role! },
-        auth
+        auth,
       );
 
       await queryClient.invalidateQueries({

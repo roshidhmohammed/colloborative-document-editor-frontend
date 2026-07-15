@@ -12,7 +12,7 @@ import {
 import ShareModal from "@/features/documentEditor/components/ShareModal";
 
 export default function DocumentPage() {
-  const params = useParams<{ id: string, documentToken:string }>();
+  const params = useParams<{ id: string; documentToken: string }>();
   const documentId = params?.id ?? "demo";
   const documentToken = params?.documentToken ?? "demo";
   const [shareOpen, setShareOpen] = useState(false);
@@ -49,7 +49,11 @@ export default function DocumentPage() {
       </div>
 
       {shareOpen && (
-        <ShareModal documentToken={documentToken} documentId={documentId} setShareOpen={setShareOpen} />
+        <ShareModal
+          documentToken={documentToken}
+          documentId={documentId}
+          setShareOpen={setShareOpen}
+        />
       )}
     </main>
   );

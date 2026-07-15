@@ -1,9 +1,6 @@
 import axiosInstance from "@/lib/axios";
 import { API_ENDPOINTS } from "@/constants/api";
-import {
-  type AuthRequestConfig,
-  withAuthHeaders,
-} from "@/lib/auth-token";
+import { type AuthRequestConfig, withAuthHeaders } from "@/lib/auth-token";
 
 import {
   CreateDocumentRequest,
@@ -27,10 +24,7 @@ export async function createDocumentApi(
 export async function getAllDocumentsApi(
   auth: AuthRequestConfig = withAuthHeaders(),
 ): Promise<GetAllDocumentsResponse> {
-  const response = await axiosInstance.get(
-    API_ENDPOINTS.DOCUMENTS,
-    auth,
-  );
+  const response = await axiosInstance.get(API_ENDPOINTS.DOCUMENTS, auth);
   return response.data.data;
 }
 

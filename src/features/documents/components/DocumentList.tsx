@@ -29,8 +29,8 @@ const DocumentList = () => {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      <CreateDocumentCard data-testid="create-document-card"/>
-        {documents.length === 0 && (
+      <CreateDocumentCard data-testid="create-document-card" />
+      {documents.length === 0 && (
         <p className="flex min-h-57.5 items-center justify-center rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-6 text-center text-sm text-slate-400">
           No documents yet. Create your first one to get started.
         </p>
@@ -43,8 +43,6 @@ const DocumentList = () => {
           <DocumentCard data-testid="document-card" document={document} />
         </Link>
       ))}
-
-    
     </div>
   );
 };

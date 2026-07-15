@@ -2,7 +2,6 @@ import { Users } from "lucide-react";
 import { useFetchCollaborators } from "../hooks/useFetchCollaborators";
 import { Collaborator } from "../types/collaborator";
 
-
 const CollaboratorList = ({ documentId }: { documentId: string }) => {
   const {
     data: collaborators = [],
@@ -32,8 +31,10 @@ const CollaboratorList = ({ documentId }: { documentId: string }) => {
           <p className="text-sm text-slate-400">No collaborators yet.</p>
         )}
 
-        {collaborators.map((person:Collaborator) => {
-          const displayName = person?.user?.fullName ? person.user.fullName :  "Not found the name";
+        {collaborators.map((person: Collaborator) => {
+          const displayName = person?.user?.fullName
+            ? person.user.fullName
+            : "Not found the name";
           return (
             <div
               key={person.id ?? person.user?.id ?? person.id}
@@ -44,11 +45,11 @@ const CollaboratorList = ({ documentId }: { documentId: string }) => {
                   {displayName}
                 </div>
               </div>
-              <span
+              {/* <span
                 className={`h-3 w-3 rounded-full ${
                   person.status === "online" ? "bg-emerald-400" : "bg-slate-500"
                 }`}
-              />
+              /> */}
             </div>
           );
         })}

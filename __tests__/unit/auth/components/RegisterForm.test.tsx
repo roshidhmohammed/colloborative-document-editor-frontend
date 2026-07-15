@@ -4,7 +4,7 @@ import RegisterForm from "@/features/auth/components/RegisterForm";
 import { useRouter } from "next/navigation";
 import { useRegister } from "@/features/auth/hooks/useRegister";
 import { AppToast } from "@/lib/toast";
-import { ROUTES } from "@/constants/routes";
+import { PAGEROUTES } from "@/constants/apiRoutes";
 import { fillForm } from "../test-utils/fillForm";
 
 jest.mock("next/navigation", () => ({
@@ -78,7 +78,7 @@ describe("RegisterForm", () => {
       title: "Registration successful",
       description: "You have successfully registered.",
     });
-    expect(replaceMock).toHaveBeenCalledWith(ROUTES.LOGIN);
+    expect(replaceMock).toHaveBeenCalledWith(PAGEROUTES.LOGIN);
   });
 
   it("shows API error when registration fails", async () => {

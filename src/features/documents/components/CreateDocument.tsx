@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/ui/Button";
 import FormField from "@/components/ui/FormField";
 import Input from "@/components/ui/Input";
-import { ROUTES } from "@/constants/routes";
+import { PAGEROUTES } from "@/constants/apiRoutes";
 
 import { createDocumentSchema } from "../schemas/createDocumentSchema";
 import { CreateDocumentFormValues } from "../types/document";
@@ -34,17 +34,19 @@ const CreateDocument = () => {
   const onSubmit = async (data: CreateDocumentFormValues) => {
     try {
       const response = await createDocumentMutation.createDocumentAsync(data);
-      console.log(response)
       AppToast.success({
         title: `${response.message}`,
         description: "You have successfully logged in.",
       });
-      router.replace(`${ROUTES.DOCUMENTS}/${response?.data.document?.id}/${response?.data.ownerToken}`);
+      router.replace(
+        `${PAGEROUTES.DOCUMENTS}/${response?.data.document?.id}/${response?.data.ownerToken}`,
+      );
     } catch (error) {
       const err = error as AxiosError<ApiErrorResponse>;
       AppToast.error({
         title: "Failed To create document",
-        description: err.response?.data?.message || "An error occurred during login.",
+        description:
+          err.response?.data?.message || "An error occurred during login.",
       });
     }
   };
@@ -65,7 +67,10 @@ const CreateDocument = () => {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
-          <FormField label="Enter the Topic (topic to create a document)" required>
+          <FormField
+            label="Enter the Topic (topic to create a document)"
+            required
+          >
             <Input
               type="text"
               placeholder="e.g. Product launch plan"

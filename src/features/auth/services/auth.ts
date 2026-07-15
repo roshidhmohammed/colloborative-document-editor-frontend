@@ -22,10 +22,6 @@ class AuthService {
     return registerApi(payload);
   }
 
-  /**
-   * 1. Server Action sets `token` on this app via cookies() (proxy can read it).
-   * 2. Client API login stores the API-domain cookie (axios/socket credentials).
-   */
   async login(
     payload: LoginRequest
   ): Promise<LoginResponse> {
@@ -34,7 +30,7 @@ class AuthService {
     try {
       await loginApi(payload);
     } catch {
-      // Next.js session cookie is already set; API cookie is best-effort.
+    
     }
 
     return result;

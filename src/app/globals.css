@@ -32,16 +32,13 @@ body {
 }
 
 .tiptap {
- width: 100%;
-
-
+  width: 100%;
 }
 
 .tiptap .ProseMirror {
   margin-top: 10px;
   border: 1px solid #515964;
   border-radius: 10px;
-
 
   padding: 20px;
 
@@ -61,7 +58,6 @@ body {
   box-sizing: border-box;
 }
 /* Basic editor styles */
-
 
 /* List styles */
 .tiptap ul,

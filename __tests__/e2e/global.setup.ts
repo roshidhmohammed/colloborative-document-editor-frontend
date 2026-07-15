@@ -30,13 +30,9 @@ export default async function globalSetup(): Promise<void> {
     !apiUrl.includes("localhost") && !apiUrl.includes("127.0.0.1");
 
   if (isRemote) {
-    console.log(`[GlobalSetup] Using remote backend API at ${apiUrl}`);
     await waitForApiReady(30, 1_000);
-    console.log(`[GlobalSetup] Remote backend API is reachable`);
     return;
   }
 
-  console.log(`[GlobalSetup] Using local backend API at ${apiUrl}`);
   await waitForApiReady();
-  console.log(`[GlobalSetup] Local backend API is reachable`);
 }

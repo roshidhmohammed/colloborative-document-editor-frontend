@@ -101,7 +101,6 @@ const Editor = ({ documentId, documentToken }: EditorProps) => {
         hasLoadedDocument.current = true;
       })
       .catch((error) => {
-        if (active) console.error(error);
       });
     const onRemoteUpdate = async (update: DocumentUpdate) => {
       applyDocumentUpdate(update);
@@ -115,7 +114,6 @@ const Editor = ({ documentId, documentToken }: EditorProps) => {
       active = false;
       hasLoadedDocument.current = false;
       socket.off("document:update", onRemoteUpdate);
-      // socket.emit("disconnect");
       ydoc.destroy();
       if (ydocRef.current === ydoc) {
         ydocRef.current = null;

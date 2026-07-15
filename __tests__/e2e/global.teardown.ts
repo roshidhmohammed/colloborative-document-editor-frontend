@@ -10,5 +10,4 @@
  * 2. Clean up the state file written by global.setup.ts.
  */
 export default async function globalTeardown(): Promise<void> {
-  console.log("[GlobalTeardown] Done.");
 }

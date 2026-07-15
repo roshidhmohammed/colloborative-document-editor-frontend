@@ -12,9 +12,7 @@ export default function GlobalError({
       <body>
         <h1>Unexpected Application Error</h1>
 
-        <button onClick={reset}>
-          Retry
-        </button>
+        <button onClick={reset}>Retry</button>
       </body>
     </html>
   );

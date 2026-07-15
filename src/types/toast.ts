@@ -1,9 +1,4 @@
-export type ToastType =
-  | "success"
-  | "error"
-  | "warning"
-  | "info"
-  | "loading";
+export type ToastType = "success" | "error" | "warning" | "info" | "loading";
 
 export interface ToastProps {
   title: string;

@@ -1,6 +1,9 @@
 import type { Socket } from "socket.io-client";
 import type { DocumentUpdate } from "../types/documentEditor";
-import { joinDocumentSocketApi, updateDocumentSocketApi } from "../api/documentSocket.api";
+import {
+  joinDocumentSocketApi,
+  updateDocumentSocketApi,
+} from "../api/documentSocket.api";
 
 class DocumentSocketService {
   joinDocument(socket: Socket, documentId: string) {
