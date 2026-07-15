@@ -34,7 +34,6 @@ const CreateDocument = () => {
   const onSubmit = async (data: CreateDocumentFormValues) => {
     try {
       const response = await createDocumentMutation.createDocumentAsync(data);
-      console.log(response);
       AppToast.success({
         title: `${response.message}`,
         description: "You have successfully logged in.",

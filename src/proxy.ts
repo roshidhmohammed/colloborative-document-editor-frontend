@@ -14,7 +14,6 @@ export async function proxy(request: NextRequest) {
   );
 
   const token = request.cookies.get("token")?.value;
-  console.log(token);
 
   let isAuthenticated = false;
 
@@ -33,7 +32,6 @@ export async function proxy(request: NextRequest) {
       isAuthenticated = data.success;
     }
   } catch (error) {
-    console.error("Auth verification failed:", error);
     isAuthenticated = false;
   }
 

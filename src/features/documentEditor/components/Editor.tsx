@@ -101,7 +101,6 @@ const Editor = ({ documentId, documentToken }: EditorProps) => {
         hasLoadedDocument.current = true;
       })
       .catch((error) => {
-        if (active) console.error(error);
       });
     const onRemoteUpdate = async (update: DocumentUpdate) => {
       applyDocumentUpdate(update);
