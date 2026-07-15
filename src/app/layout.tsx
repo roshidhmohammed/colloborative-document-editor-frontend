@@ -12,12 +12,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-         {/* <ReduxProvider> */}
+        {/* <ReduxProvider> */}
         <QueryProvider>
-           <SonnerProvider />
-            {children}
+          <SonnerProvider />
+          {children}
         </QueryProvider>
-         {/* </ReduxProvider> */}
+        {/* </ReduxProvider> */}
       </body>
     </html>
   );

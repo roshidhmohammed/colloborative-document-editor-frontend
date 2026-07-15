@@ -25,7 +25,5 @@ export function useUserAuth() {
     data: query.data,
 
     refetch: query.refetch,
-
-    // reset: query.remove,
   };
 }

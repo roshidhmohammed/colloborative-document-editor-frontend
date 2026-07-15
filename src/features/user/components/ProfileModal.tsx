@@ -4,7 +4,7 @@ import { useFetchProfile } from "../hooks/useFetchProfile";
 import Button from "@/components/ui/Button";
 import axiosInstance from "@/lib/axios";
 import { API_ENDPOINTS } from "@/constants/api";
-import { ROUTES } from "@/constants/routes";
+import { PAGEROUTES } from "@/constants/apiRoutes";
 import { AppToast } from "@/lib/toast";
 import { clearAuthToken } from "@/features/auth/actions/authCookies";
 import { withAuthHeaders } from "@/lib/auth-token";
@@ -21,7 +21,7 @@ const ProfileModal = () => {
         { withCredentials: true, ...withAuthHeaders() }
       );
       await clearAuthToken();
-      router.replace(ROUTES.LOGIN);
+      router.replace(PAGEROUTES.LOGIN);
     } catch (error) {
       AppToast.error({
         title: "Logout Failed",

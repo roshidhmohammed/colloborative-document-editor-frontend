@@ -115,7 +115,6 @@ const Editor = ({ documentId, documentToken }: EditorProps) => {
       active = false;
       hasLoadedDocument.current = false;
       socket.off("document:update", onRemoteUpdate);
-      // socket.emit("disconnect");
       ydoc.destroy();
       if (ydocRef.current === ydoc) {
         ydocRef.current = null;

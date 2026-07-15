@@ -5,7 +5,7 @@ import ProfileModal from "@/features/user/components/ProfileModal";
 import { AppToast } from "@/lib/toast";
 import axiosInstance from "@/lib/axios";
 import { API_ENDPOINTS } from "@/constants/api";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES } from "@/constants/apiRoutes";
 
 const mockReplace = jest.fn();
 const mockUseFetchProfile = jest.fn();

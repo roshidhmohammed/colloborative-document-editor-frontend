@@ -17,12 +17,10 @@ export default function QueryProvider({ children }: Props) {
             refetchOnWindowFocus: false,
           },
         },
-      })
+      }),
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 }

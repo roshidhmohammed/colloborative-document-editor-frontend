@@ -4,7 +4,7 @@ import CreateDocument from "@/features/documents/components/CreateDocument";
 import { useRouter } from "next/navigation";
 import { useCreateDocument } from "@/features/documents/hooks/useCreateDocument";
 import { AppToast } from "@/lib/toast";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES } from "@/constants/apiRoutes";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),

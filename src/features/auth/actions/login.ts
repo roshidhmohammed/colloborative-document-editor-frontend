@@ -8,7 +8,7 @@ import { setAuthToken } from "./authCookies";
 
 function extractToken(
   setCookieHeader: string | null,
-  body: Record<string, unknown>
+  body: Record<string, unknown>,
 ): string | null {
   if (typeof body.token === "string" && body.token) {
     return body.token;
@@ -54,7 +54,7 @@ function extractUser(body: Record<string, unknown>): User {
  * via `cookies()` from `next/headers` so `proxy.ts` can read it.
  */
 export async function loginAction(
-  payload: LoginRequest
+  payload: LoginRequest,
 ): Promise<LoginResponse> {
   const apiUrl = env.API_URL;
 

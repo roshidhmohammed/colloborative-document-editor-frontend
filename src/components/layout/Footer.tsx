@@ -12,18 +12,20 @@ export default function Footer() {
         </p>
 
         <div className="mt-4 flex items-center gap-3">
-          {socialLinks.map(({ label, href, icon: Icon }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={label}
-              className="flex p-4 items-center justify-center rounded-full   text-slate-200 transition hover:border-slate-700 hover:text-white"
-            >
-              <p className="text-lg">{Icon}</p>
-            </a>
-          ))}
+          {socialLinks.map(
+            ({ label, href, icon: Icon, className: className }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={label}
+                className="flex p-4 items-center justify-center rounded-full   text-slate-200 transition hover:border-slate-700 hover:text-white"
+              >
+                <Icon className={className} />
+              </a>
+            ),
+          )}
         </div>
       </div>
     </footer>

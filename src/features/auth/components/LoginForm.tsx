@@ -71,11 +71,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
     >
       {/* Email */}
 
-      <FormField
-        label="Email Address"
-        htmlFor="email"
-        required
-      >
+      <FormField label="Email Address" htmlFor="email" required>
         <Input
           id="email"
           type="email"
@@ -88,11 +84,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
 
       {/* Password */}
 
-      <FormField
-        label="Password"
-        htmlFor="password"
-        required
-      >
+      <FormField label="Password" htmlFor="password" required>
         <PasswordInput
           id="password"
           autoComplete="current-password"
@@ -102,10 +94,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
       </FormField>
 
       {/* Login Button */}
-      <Button
-        type="submit"
-        loading={loginMutation.isPending}
-      >
+      <Button type="submit" loading={loginMutation.isPending}>
         Login
       </Button>
     </form>

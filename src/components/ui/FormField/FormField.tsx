@@ -1,13 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
-
-interface Props {
-  label: string;
-  required?: boolean;
-  children: ReactNode;
-  htmlFor?: string;
-}
+import { Props } from "@/types/formFields";
 
 export default function FormField({
   label,
@@ -20,9 +13,7 @@ export default function FormField({
       <label htmlFor={htmlFor} className="text-sm font-medium">
         {label}
 
-        {required && (
-          <span className="ml-1 text-red-500">*</span>
-        )}
+        {required && <span className="ml-1 text-red-500">*</span>}
       </label>
 
       {children}

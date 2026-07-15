@@ -28,7 +28,7 @@ const ShareModal = ({
 
   const shareLink = useMemo(() => {
     const selectedLink = documentShareLinks.find(
-      (link) => link.role === role && link.isActive
+      (link) => link.role === role && link.isActive,
     );
 
     if (!selectedLink) {
@@ -47,22 +47,24 @@ const ShareModal = ({
     try {
       await navigator.clipboard.writeText(shareLink);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
     }
   };
 
   return (
-    <Modal title="Share document" description="Choose access for the shared link." onClose={() => setShareOpen(false)}>
+    <Modal
+      title="Share document"
+      description="Choose access for the shared link."
+      onClose={() => setShareOpen(false)}
+    >
       <div className="mt-5 space-y-4">
         <label className="block text-sm font-medium text-slate-200">
           Access level
           <select
             value={role}
-            onChange={(event) =>
-              setRole(event.target.value as ShareableRole)
-            }
+            onChange={(event) => setRole(event.target.value as ShareableRole)}
             className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-cyan-400"
           >
             <option value="VIEWER">Viewer</option>

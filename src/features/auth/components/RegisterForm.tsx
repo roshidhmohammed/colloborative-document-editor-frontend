@@ -10,7 +10,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PasswordInput from "@/components/ui/PasswordInput";
 import FormField from "@/components/ui/FormField";
-import { ROUTES } from "@/constants/routes";
+import { PAGEROUTES } from "@/constants/apiRoutes";
 import { AppToast } from "@/lib/toast";
 
 export default function RegisterForm() {
@@ -34,7 +34,7 @@ export default function RegisterForm() {
         description: "You have successfully registered.",
       });
 
-      router.replace(ROUTES.LOGIN);
+      router.replace(PAGEROUTES.LOGIN);
     } catch (error) {
       AppToast.error({
         title: "Registration failed",
