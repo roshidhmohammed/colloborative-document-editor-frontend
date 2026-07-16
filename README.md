@@ -1,6 +1,6 @@
-# Collab Doc Creator
+# Collab Doc Creator -Frontend
 
-A real-time collaborative document editor. Create documents, share them with others, and edit together with live sync — including offline support that catches up when you reconnect.
+  This backend powers a real-time collaborative document editor. It provides authentication, document management, collaboration, sharing, and real-time synchronization using Socket.IO and Yjs. The backend follows a RESTful architecture with JWT-based authentication,  PostgreSQL as the development database, and Supabase as the production database.
 
 This repository is the **frontend**. It talks to a separate backend API and Socket.IO server for auth, persistence, and realtime updates.
 
@@ -9,7 +9,7 @@ This repository is the **frontend**. It talks to a separate backend API and Sock
 ## Features
 
 - **Authentication** — Register, log in, and stay signed in with a JWT cookie. Protected routes keep unauthenticated users out.
-- **Document management** — Create documents by topic, browse your list, and open shared links.
+- **Document management** — Create documents by topic, browse document list, and open shared links.
 - **Rich text editing** — TipTap-powered editor with headings, formatting, highlight, and text alignment.
 - **Realtime collaboration** — Changes sync across clients using Yjs (CRDT) over Socket.IO.
 - **Role-based access** — `OWNER` and `EDITOR` can edit; `VIEWER` is read-only. Share links for either role.
@@ -21,18 +21,18 @@ This repository is the **frontend**. It talks to a separate backend API and Sock
 
 ## Tech stack
 
-- Framework                                  # Next.js 16 (App Router), React 19, TypeScript
-- Styling                                    # Tailwind CSS v4
-- Data fetching                              # TanStack React Query, Axios 
-- Forms & validation                         # React Hook Form, Zod 
-- Document Editor                            # TipTap 
--  Collaboration                             # Yjs, y-prosemirror, Socket.IO client
--  Offline storage                           # IndexedDB (`idb`) 
-- Notifications                              # Sonner
-- Unit tests                                 # Jest, Testing Library 
-- E2E tests                                  # Playwright
-- Automated Testing and Deployment Pipeline  # Github Actions
-- Deploy                                     # Vercel 
+- Framework                                         # Next.js 16 (App Router), React 19, TypeScript
+- Styling                                           # Tailwind CSS v4
+- Data fetching                                     # TanStack React Query, Axios 
+- Forms & validation                                # React Hook Form, Zod 
+- Document Editor                                   # TipTap 
+- Collaboration                                     # Yjs, y-prosemirror, Socket.IO client
+- Offline storage                                   # IndexedDB (`idb`) 
+- Notifications                                     # Sonner
+- Unit tests                                        # Jest, Testing Library 
+- E2E tests                                         # Playwright
+- Automated Testing and Deployment Pipeline(CI?CD)  # Github Actions
+- Deploy                                            # Vercel 
 
 ---
 
@@ -113,9 +113,13 @@ NEXT_PUBLIC_SOCKET_URL=http://localhost:<backend-port>/
 
 ```bash
 NEXT_PUBLIC_APP_ENV=testing
-NEXT_PUBLIC_API_URL=https://colloborative-doc-editor-backend.onrender.com/api
-NEXT_PUBLIC_SOCKET_URL=https://colloborative-doc-editor-backend.onrender.com/
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
+PORT=3000
+NEXT_PUBLIC_BASE_URL=<FRONTEND_URL>
+NEXT_PUBLIC_MOCK_API_PORT=<PORT>
+NEXT_PUBLIC_API_URL=<BACKEND_URL>/api
+NEXT_PUBLIC_SOCKET_URL=<BACKEND_URL>/
+MOCK_API_URL=<BACKEND_URL>/api
+NEXT_PUBLIC_APP_ENV=testing
 ```
 
 **`.env.production`** (used by `npm start`):
@@ -248,7 +252,8 @@ E2E expects a reachable backend (or the URLs in `.env.testing`). CI writes testi
 
 The app deploys to **Vercel**.
 
-- Pull requests and pushes to `dev` run lint/build/test workflows.
+- Commit the latest changes to the new `features` branch or `dev` branch.
+- Pull requests and pushes to `dev` build/test workflows.
 - Pushes to `main` run tests, then build and deploy to production via the Vercel CLI.
 - `vercel.json` sets Next.js as the framework and adds basic security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`).
 
@@ -259,6 +264,8 @@ Production needs `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_SOCKET_URL` pointed at y
 ## Related backend
 
 Persistence and socket rooms live in the companion backend (example host used in testing: `colloborative-doc-editor-backend.onrender.com`). This frontend does not include a database; Mongo-style IDs in the types reflect the backend’s data model.
+
+Backend Github Repo - [https://github.com/roshidhmohammed/colloborative-doc-editor-backend](https://github.com/roshidhmohammed/colloborative-doc-editor-backend)
 
 Backend is hosted in thus domain:  `https://colloborative-doc-editor-backend-production.up.railway.app`
 
