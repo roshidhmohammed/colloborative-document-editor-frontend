@@ -63,6 +63,7 @@ export default function LoginForm({ returnTo }: LoginFormProps) {
     }
   }
 
+  console.log("Deployed version: 2.0")
   return (
     <form
       noValidate
