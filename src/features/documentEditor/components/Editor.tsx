@@ -20,19 +20,27 @@ import { documentSocketService } from "../services/documentSocket";
 import type { DocumentUpdate, EditorProps } from "../types/documentEditor";
 import {
   getDocument,
+  hasPendingUpdates,
   saveDocument,
 } from "../services/docOfflineStorage";
-import { useOfflineSync } from "../hooks/useDocOfflineSync";
+import {
+  flushPendingDocumentUpdates,
+  useOfflineSync,
+} from "../hooks/useDocOfflineSync";
 import useEditorConfig from "../hooks/useEditorConfig";
 
 
 const Editor = ({ documentId, documentToken }: EditorProps) => {
   const socket = getSocket();
-  useOfflineSync(socket, documentId);
 
   const ydocRef = useRef<Y.Doc | null>(null);
   const isApplyingRemoteUpdate = useRef(false);
   const hasLoadedDocument = useRef(false);
+  const joinFromServerRef = useRef<(() => Promise<void>) | null>(null);
+
+  useOfflineSync(socket, documentId, async () => {
+    await joinFromServerRef.current?.();
+  });
 
   const { data: canEdit = false } = useFetchDocumentDetails(documentToken, {
     select: selectCanEditDocument,
@@ -59,6 +67,11 @@ const Editor = ({ documentId, documentToken }: EditorProps) => {
 
     ydocRef.current = ydoc;
 
+    const persistFullState = async () => {
+      if (!active) return;
+      await saveDocument(documentId, Y.encodeStateAsUpdate(ydoc));
+    };
+
     const applyDocumentUpdate = (
       update: DocumentUpdate | ArrayBuffer | number[],
     ) => {
@@ -82,30 +95,64 @@ const Editor = ({ documentId, documentToken }: EditorProps) => {
     async function loadDocumentFromIndexedDB() {
       const local = await getDocument(documentId);
 
+      if (!active || !local) return;
+
+      applyDocumentUpdate(local);
+      hasLoadedDocument.current = true;
+    }
+
+    /**
+     * Fetch latest from server, merge into the local Y.Doc, persist to IndexedDB,
+     * and show in the editor.
+     */
+    async function joinFromServer() {
+      const update = await documentSocketService.joinDocument(socket, documentId);
+
+      if (!active) return;
+
+      applyDocumentUpdate(update);
+      await persistFullState();
+      hasLoadedDocument.current = true;
+    }
+
+    joinFromServerRef.current = joinFromServer;
+
+    async function init() {
+      // Keep any unsynced local writes in the Y.Doc before talking to the server
+      // so a CRDT merge does not drop offline edits.
+      const local = await getDocument(documentId);
+      if (!active) return;
+
       if (local) {
         applyDocumentUpdate(local);
-        hasLoadedDocument.current = true;
+      }
+
+      try {
+        // Push unsynced IndexedDB writes to the backend first (if any).
+        if (await hasPendingUpdates(documentId)) {
+          await flushPendingDocumentUpdates(socket, documentId);
+          if (!active) return;
+        }
+
+        // Fetch latest from server → IndexedDB → editor.
+        await joinFromServer();
+      } catch {
+        // Offline / join failed: show IndexedDB content if we have it.
+        if (!active) return;
+
+        if (local) {
+          hasLoadedDocument.current = true;
+        } else {
+          await loadDocumentFromIndexedDB();
+        }
       }
     }
 
-    loadDocumentFromIndexedDB();
+    void init();
 
-    documentSocketService
-      .joinDocument(socket, documentId)
-      .then(async (update) => {
-        if (!active) return;
-
-        applyDocumentUpdate(update);
-        await saveDocument(documentId, toUint8Array(update));
-
-        hasLoadedDocument.current = true;
-      })
-      .catch((error) => {
-      });
     const onRemoteUpdate = async (update: DocumentUpdate) => {
       applyDocumentUpdate(update);
-
-      await saveDocument(documentId, toUint8Array(update));
+      await persistFullState();
     };
 
     socket.on("document:update", onRemoteUpdate);
@@ -113,6 +160,7 @@ const Editor = ({ documentId, documentToken }: EditorProps) => {
     return () => {
       active = false;
       hasLoadedDocument.current = false;
+      joinFromServerRef.current = null;
       socket.off("document:update", onRemoteUpdate);
       ydoc.destroy();
       if (ydocRef.current === ydoc) {

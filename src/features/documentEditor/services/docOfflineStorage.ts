@@ -12,21 +12,20 @@ export async function saveDocument(
 export async function getDocument(documentId: string) {
   const db = await dbPromise;
 
-  return db.get("documents", documentId);
+  return db.get("documents", documentId) as Promise<Uint8Array | undefined>;
 }
 
+/**
+ * Marks the document as needing a backend sync.
+ * Stores only the latest write (full Yjs state) — overwritten on each offline edit.
+ */
 export async function queuePendingUpdate(
   documentId: string,
   update: Uint8Array
 ) {
   const db = await dbPromise;
 
-  const updates =
-    ((await db.get("pending-updates", documentId)) as Uint8Array[]) ?? [];
-
-  updates.push(update);
-
-  await db.put("pending-updates", updates, documentId);
+  await db.put("pending-updates", [update], documentId);
 }
 
 export async function getPendingUpdates(documentId: string) {
@@ -40,9 +39,13 @@ export async function getPendingUpdates(documentId: string) {
   );
 }
 
+export async function hasPendingUpdates(documentId: string) {
+  const updates = await getPendingUpdates(documentId);
+  return updates.length > 0;
+}
+
 export async function clearPendingUpdates(documentId: string) {
   const db = await dbPromise;
 
   await db.delete("pending-updates", documentId);
 }
-

@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
-import { useEditor } from "@tiptap/react";
 import useEditorConfig from "@/features/documentEditor/hooks/useEditorConfig";
+import { useEditor } from "@tiptap/react";
 import { saveDocument, queuePendingUpdate } from "@/features/documentEditor/services/docOfflineStorage";
 import { documentSocketService } from "@/features/documentEditor/services/documentSocket";
 import * as Y from "yjs";
@@ -59,7 +59,7 @@ describe("useEditorConfig Hook", () => {
   const mockQueuePendingUpdate = queuePendingUpdate as jest.Mock;
   const mockUpdateDocument = documentSocketService.updateDocument as jest.Mock;
 
-  const mockSocket = {} as unknown as Socket;
+  const mockSocket = { connected: true } as unknown as Socket;
   const originalOnLine = navigator.onLine;
 
   const setOnLine = (status: boolean) => {
@@ -72,7 +72,9 @@ describe("useEditorConfig Hook", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setOnLine(true);
+    (mockSocket as { connected: boolean }).connected = true;
     mockEncodeStateAsUpdate.mockReturnValue(new Uint8Array([2])); // byteLength > 0 by default
+    mockUpdateDocument.mockResolvedValue(undefined);
   });
 
   afterAll(() => {
@@ -199,15 +201,20 @@ describe("useEditorConfig Hook", () => {
     expect(mockUpdateDocument).not.toHaveBeenCalled();
   });
 
-  it("saves the document and calls updateDocument via socket when navigator is online", async () => {
+  it("saves to IndexedDB first then sends the delta when socket is connected", async () => {
     const isApplyingRemoteUpdate = { current: false };
     const hasLoadedDocument = { current: true };
     const mockYDoc = { getXmlFragment: jest.fn(() => "fragment") };
     const ydocRef = { current: mockYDoc as unknown as Y.Doc };
-    const mockUpdate = new Uint8Array([10, 20]);
-    mockEncodeStateAsUpdate.mockReturnValue(mockUpdate);
+    const mockDelta = new Uint8Array([10, 20]);
+    const mockFullState = new Uint8Array([10, 20, 30, 40]);
+
+    mockEncodeStateAsUpdate
+      .mockReturnValueOnce(mockDelta)
+      .mockReturnValueOnce(mockFullState);
 
     setOnLine(true);
+    (mockSocket as { connected: boolean }).connected = true;
 
     const { result } = renderHook(() =>
       useEditorConfig(
@@ -223,18 +230,22 @@ describe("useEditorConfig Hook", () => {
     const onUpdate = (result.current.editor as unknown as MockEditor)._options.onUpdate;
     await onUpdate({ editor: result.current.editor });
 
-    expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", mockUpdate);
-    expect(mockUpdateDocument).toHaveBeenCalledWith(mockSocket, "doc-123", mockUpdate);
+    expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", mockFullState);
+    expect(mockUpdateDocument).toHaveBeenCalledWith(mockSocket, "doc-123", mockDelta);
     expect(mockQueuePendingUpdate).not.toHaveBeenCalled();
   });
 
-  it("saves the document and queues pending update when navigator is offline", async () => {
+  it("saves to IndexedDB and queues the latest write when offline", async () => {
     const isApplyingRemoteUpdate = { current: false };
     const hasLoadedDocument = { current: true };
     const mockYDoc = { getXmlFragment: jest.fn(() => "fragment") };
     const ydocRef = { current: mockYDoc as unknown as Y.Doc };
-    const mockUpdate = new Uint8Array([30, 40]);
-    mockEncodeStateAsUpdate.mockReturnValue(mockUpdate);
+    const mockDelta = new Uint8Array([30, 40]);
+    const mockFullState = new Uint8Array([30, 40, 50]);
+
+    mockEncodeStateAsUpdate
+      .mockReturnValueOnce(mockDelta)
+      .mockReturnValueOnce(mockFullState);
 
     setOnLine(false);
 
@@ -252,8 +263,73 @@ describe("useEditorConfig Hook", () => {
     const onUpdate = (result.current.editor as unknown as MockEditor)._options.onUpdate;
     await onUpdate({ editor: result.current.editor });
 
-    expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", mockUpdate);
-    expect(mockQueuePendingUpdate).toHaveBeenCalledWith("doc-123", mockUpdate);
+    expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", mockFullState);
+    expect(mockQueuePendingUpdate).toHaveBeenCalledWith("doc-123", mockFullState);
     expect(mockUpdateDocument).not.toHaveBeenCalled();
+  });
+
+  it("queues the latest IndexedDB write when the socket is disconnected", async () => {
+    const isApplyingRemoteUpdate = { current: false };
+    const hasLoadedDocument = { current: true };
+    const mockYDoc = { getXmlFragment: jest.fn(() => "fragment") };
+    const ydocRef = { current: mockYDoc as unknown as Y.Doc };
+    const mockDelta = new Uint8Array([1, 2]);
+    const mockFullState = new Uint8Array([1, 2, 3]);
+
+    mockEncodeStateAsUpdate
+      .mockReturnValueOnce(mockDelta)
+      .mockReturnValueOnce(mockFullState);
+
+    setOnLine(true);
+    (mockSocket as { connected: boolean }).connected = false;
+
+    const { result } = renderHook(() =>
+      useEditorConfig(
+        true,
+        "doc-123",
+        mockSocket,
+        isApplyingRemoteUpdate,
+        hasLoadedDocument,
+        ydocRef
+      )
+    );
+
+    const onUpdate = (result.current.editor as unknown as MockEditor)._options.onUpdate;
+    await onUpdate({ editor: result.current.editor });
+
+    expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", mockFullState);
+    expect(mockQueuePendingUpdate).toHaveBeenCalledWith("doc-123", mockFullState);
+    expect(mockUpdateDocument).not.toHaveBeenCalled();
+  });
+
+  it("queues the latest write when the backend update fails", async () => {
+    const isApplyingRemoteUpdate = { current: false };
+    const hasLoadedDocument = { current: true };
+    const mockYDoc = { getXmlFragment: jest.fn(() => "fragment") };
+    const ydocRef = { current: mockYDoc as unknown as Y.Doc };
+    const mockDelta = new Uint8Array([1, 2]);
+    const mockFullState = new Uint8Array([1, 2, 3]);
+
+    mockEncodeStateAsUpdate
+      .mockReturnValueOnce(mockDelta)
+      .mockReturnValueOnce(mockFullState);
+    mockUpdateDocument.mockRejectedValue(new Error("ack failed"));
+
+    const { result } = renderHook(() =>
+      useEditorConfig(
+        true,
+        "doc-123",
+        mockSocket,
+        isApplyingRemoteUpdate,
+        hasLoadedDocument,
+        ydocRef
+      )
+    );
+
+    const onUpdate = (result.current.editor as unknown as MockEditor)._options.onUpdate;
+    await onUpdate({ editor: result.current.editor });
+
+    expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", mockFullState);
+    expect(mockQueuePendingUpdate).toHaveBeenCalledWith("doc-123", mockFullState);
   });
 });
