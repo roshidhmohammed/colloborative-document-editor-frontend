@@ -7,7 +7,6 @@ import {
 import * as Y from "yjs";
 import {
   prosemirrorToYXmlFragment,
-  yDocToProsemirrorJSON,
 } from "y-prosemirror";
 
 import { documentSocketService } from "../services/documentSocket";
@@ -60,17 +59,30 @@ const useEditorConfig = (
 
       if (update.byteLength === 0) return;
 
-      async function sendUpdate() {
-        await saveDocument(documentId, update);
+      // Full document state — source of truth in IndexedDB for reload / reconnect.
+      const fullState = Y.encodeStateAsUpdate(ydoc);
 
-        if (navigator.onLine) {
-          void documentSocketService.updateDocument(socket, documentId, update);
-        } else {
-          await queuePendingUpdate(documentId, update);
+      async function sendUpdate() {
+        // 1) Always persist to IndexedDB first.
+        await saveDocument(documentId, fullState);
+
+        const canReachServer = navigator.onLine && socket.connected;
+
+        if (!canReachServer) {
+          // Mark latest IndexedDB write for backend sync when connectivity returns.
+          await queuePendingUpdate(documentId, fullState);
+          return;
+        }
+
+        // 2) Then push to the backend.
+        try {
+          await documentSocketService.updateDocument(socket, documentId, update);
+        } catch {
+          await queuePendingUpdate(documentId, fullState);
         }
       }
 
-      sendUpdate();
+      return sendUpdate();
     },
   });
   return { editor };

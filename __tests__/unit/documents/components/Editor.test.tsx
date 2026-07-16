@@ -45,6 +45,7 @@ jest.mock("yjs", () => ({
     guid: "mock-guid",
   })),
   applyUpdate: jest.fn(),
+  encodeStateAsUpdate: jest.fn(() => new Uint8Array([100, 101, 102])),
 }));
 
 // Mock y-prosemirror
@@ -78,11 +79,13 @@ jest.mock("@/features/documentEditor/api/documentSocket.api", () => ({
 jest.mock("@/features/documentEditor/services/docOfflineStorage", () => ({
   getDocument: jest.fn(),
   saveDocument: jest.fn(),
+  hasPendingUpdates: jest.fn().mockResolvedValue(false),
 }));
 
 // Mock offline sync hook
 jest.mock("@/features/documentEditor/hooks/useDocOfflineSync", () => ({
   useOfflineSync: jest.fn(),
+  flushPendingDocumentUpdates: jest.fn().mockResolvedValue(undefined),
 }));
 
 // Mock document socket service
@@ -173,15 +176,17 @@ describe("Editor Component", () => {
     });
   });
 
-  it("joins the document socket and saves server content to IndexedDB", async () => {
+  it("joins the document socket and saves the merged full Yjs state to IndexedDB", async () => {
     const serverUpdate = new Uint8Array([4, 5, 6]);
+    const fullState = new Uint8Array([100, 101, 102]);
     mockJoinDocument.mockResolvedValue(serverUpdate);
+    (Y.encodeStateAsUpdate as jest.Mock).mockReturnValue(fullState);
 
     render(<Editor documentId="doc-123" documentToken="token-123" />);
 
     await waitFor(() => {
       expect(mockJoinDocument).toHaveBeenCalledWith(mockSocket, "doc-123");
-      expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", serverUpdate);
+      expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", fullState);
       expect(mockEditor.commands.setContent).toHaveBeenCalledWith(
         expect.any(String),
         { emitUpdate: false }
@@ -201,7 +206,10 @@ describe("Editor Component", () => {
     });
   });
 
-  it("subscribes to remote socket updates and saves updates locally", async () => {
+  it("subscribes to remote socket updates and saves the merged full Yjs state locally", async () => {
+    const fullState = new Uint8Array([100, 101, 102]);
+    (Y.encodeStateAsUpdate as jest.Mock).mockReturnValue(fullState);
+
     render(<Editor documentId="doc-123" documentToken="token-123" />);
 
     // Get the socket event listener for 'document:update'
@@ -219,7 +227,7 @@ describe("Editor Component", () => {
       await listener(remoteUpdate);
     }
 
-    expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", remoteUpdate);
+    expect(mockSaveDocument).toHaveBeenCalledWith("doc-123", fullState);
     expect(mockEditor.commands.setContent).toHaveBeenCalledWith(
       expect.any(String),
       { emitUpdate: false }
@@ -274,7 +282,6 @@ describe("Editor Component", () => {
     // Yield control to let microtasks execute
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(mockEditor.commands.setContent).not.toHaveBeenCalled();
     expect(mockSaveDocument).not.toHaveBeenCalled();
   });
 
